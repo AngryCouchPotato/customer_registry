@@ -25,5 +25,9 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
+    
+    // Library is used in JUnit tests
+    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
+
 }
 

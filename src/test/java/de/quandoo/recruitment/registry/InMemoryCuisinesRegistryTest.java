@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 
 public class InMemoryCuisinesRegistryTest {
@@ -33,9 +34,9 @@ public class InMemoryCuisinesRegistryTest {
     public void cuisineCustomers() {
         // Given
         Cuisine cuisine = new Cuisine("French");
-        Customer[] expectedCustomers = new Customer[2];
-        expectedCustomers[0] = new Customer("1");
-        expectedCustomers[1] = new Customer("7");
+        List<Customer> expectedCustomers = new ArrayList<>(2);
+        expectedCustomers.add(new Customer("1"));
+        expectedCustomers.add(new Customer("7"));
 
         // When
         List<Customer> customers = cuisinesRegistry.cuisineCustomers(cuisine);
@@ -43,7 +44,8 @@ public class InMemoryCuisinesRegistryTest {
         // Then
         assertNotNull(customers);
         assertEquals(2, customers.size());
-        assertEquals(expectedCustomers, customers);
+        assertThat("List equality without order",
+            expectedCustomers, containsInAnyOrder(customers.toArray()));
     }
 
     @Test
@@ -63,11 +65,11 @@ public class InMemoryCuisinesRegistryTest {
     public void customerCuisines() {
         // Given
         Customer customer = new Customer("7");
-        Cuisine [] expectedCuisines = new Cuisine[4];
-        expectedCuisines[0] = new Cuisine("Italian");
-        expectedCuisines[1] = new Cuisine("French");
-        expectedCuisines[2] = new Cuisine("Russian");
-        expectedCuisines[3] = new Cuisine("German");
+        List<Cuisine> expectedCuisines = new ArrayList<>(4);
+        expectedCuisines.add(new Cuisine("Italian"));
+        expectedCuisines.add(new Cuisine("French"));
+        expectedCuisines.add(new Cuisine("Russian"));
+        expectedCuisines.add(new Cuisine("German"));
 
         // When
         List<Cuisine> cuisines = cuisinesRegistry.customerCuisines(customer);
@@ -75,7 +77,8 @@ public class InMemoryCuisinesRegistryTest {
         // Then
         assertNotNull(cuisines);
         assertEquals(4, cuisines.size());
-        assertArrayEquals(expectedCuisines, cuisines.toArray());
+        assertThat("List equality without order",
+            expectedCuisines, containsInAnyOrder(cuisines.toArray()));
     }
 
     @Test
