@@ -3,61 +3,55 @@ package de.quandoo.recruitment.registry;
 import de.quandoo.recruitment.registry.api.CuisinesRegistry;
 import de.quandoo.recruitment.registry.model.Cuisine;
 import de.quandoo.recruitment.registry.model.Customer;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 
 public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
-    private List italianCuisineCustomers = new LinkedList();
-    private List frenchCuisineCustomers = new LinkedList();
-    private List germanCuisineCustomers = new LinkedList();
-
-    private String cuisineName;
+    private Map<Customer, Set<Cuisine>> cuisinesByCustomers = new HashMap<>();
+    private Map<Cuisine, Set<Customer>> customersByCuisines = new HashMap<>();
 
     @Override
-    public void register(final Customer userId, final Cuisine cuisine) {
-        cuisineName = cuisine.getName();
-        if (cuisineName == "italian") {
-            italianCuisineCustomers.add(userId);
-        } else
-        {
-            if (cuisineName == "french") {
-                frenchCuisineCustomers.add(userId);
-            } else if (cuisine.getName() == "german") {
-                germanCuisineCustomers.add(userId);
-            }
+    public void register(final Customer customer, final Cuisine cuisine) {
+        if(customer == null || cuisine == null) {
+
         }
-        System.err.println("Unknown cuisine, please reach johny@bookthattable.de to update the code");
+
+        Set<Cuisine> cuisines;
+        if(cuisinesByCustomers.containsKey(customer)) {
+            cuisines = cuisinesByCustomers.get(customer);
+            cuisines.add(cuisine);
+        } else {
+            cuisines = new HashSet<>();
+            cuisines.add(cuisine);
+            cuisinesByCustomers.put(customer, cuisines);
+        }
+
+        Set<Customer> customers;
+        if(customersByCuisines.containsKey(cuisine)) {
+            customers = customersByCuisines.get(cuisine);
+            customers.add(customer);
+        } else {
+            customers = new HashSet<>();
+            customers.add(customer);
+            customersByCuisines.put(cuisine, customers);
+        }
     }
 
     @Override
     public List<Customer> cuisineCustomers(final Cuisine cuisine) {
-        if (cuisineName == "italian") {
-            return italianCuisineCustomers;
-        } else
-        {
-            if (cuisineName == "french") {
-                return frenchCuisineCustomers;
-            } else if (cuisineName == "german") {
-                return germanCuisineCustomers;
-            }
+        if(cuisine == null) {
+            return Collections.emptyList();
         }
-        return null;
+        return new ArrayList<>(customersByCuisines.get(cuisine));
     }
 
     @Override
     public List<Cuisine> customerCuisines(final Customer customer) {
-        if (italianCuisineCustomers.contains(customer)) {
-            return Arrays.asList(new Cuisine("italian"));
+        if(customer == null) {
+            return Collections.emptyList();
         }
-        if (frenchCuisineCustomers.contains(customer)) {
-            return Arrays.asList(new Cuisine("french"));
-        }
-        if (germanCuisineCustomers.contains(customer)) {
-            return Arrays.asList(new Cuisine("german"));
-        }
-        return null;
+        return new ArrayList<>(cuisinesByCustomers.get(customer));
     }
 
     @Override
