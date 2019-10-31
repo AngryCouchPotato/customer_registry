@@ -95,7 +95,7 @@ public class InMemoryCuisinesRegistryTest {
     }
 
     @Test
-    public void topCuisines() {
+    public void topCuisinesOnlyOne() {
         // Given
         Cuisine expectedCuisine = new Cuisine("Italian");
         int count = 1;
@@ -108,6 +108,24 @@ public class InMemoryCuisinesRegistryTest {
         assertEquals(1, topCuisines.size());
         assertEquals(expectedCuisine, topCuisines.get(0));
     }
+
+  @Test
+  public void topCuisinesMultiple() {
+    // Given
+    List<Cuisine> expectedCuisines = new ArrayList<>(4);
+    expectedCuisines.add(new Cuisine("Italian"));
+    expectedCuisines.add(new Cuisine("German"));
+    int count = 2;
+
+    // When
+    List<Cuisine> topCuisines = cuisinesRegistry.topCuisines(count);
+
+    // Then
+    assertNotNull(topCuisines);
+    assertEquals(2, topCuisines.size());
+    assertThat("List equality without order",
+        expectedCuisines, containsInAnyOrder(topCuisines.toArray()));
+  }
 
 
 }

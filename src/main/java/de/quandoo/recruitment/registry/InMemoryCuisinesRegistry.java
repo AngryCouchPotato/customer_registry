@@ -56,6 +56,21 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
     @Override
     public List<Cuisine> topCuisines(final int n) {
-        throw new RuntimeException("Not implemented");
+        PriorityQueue<Map.Entry<Cuisine, Set<Customer>>> queue = new PriorityQueue<>(new TopCuisineComparator());
+        customersByCuisines.entrySet().forEach((entry) -> queue.add(entry));
+
+        List<Cuisine> topCuisines = new ArrayList<>(n);
+        for(int i = 0; i < n && !queue.isEmpty(); i++) {
+            topCuisines.add(queue.poll().getKey());
+        }
+        return topCuisines;
+    }
+
+    class TopCuisineComparator implements Comparator<Map.Entry<Cuisine, Set<Customer>>> {
+
+        @Override
+        public int compare(Map.Entry<Cuisine, Set<Customer>> left, Map.Entry<Cuisine, Set<Customer>> right) {
+            return Integer.compare(right.getValue().size(), left.getValue().size());
+        }
     }
 }
