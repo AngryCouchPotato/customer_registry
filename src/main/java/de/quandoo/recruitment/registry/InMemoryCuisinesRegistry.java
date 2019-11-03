@@ -27,13 +27,19 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
             logger.error(String.format("Cuisine can not be null. Customer = %s", customer));
             return;
         }
+        registerCuisineByCustomer(cuisine, customer);
+        registerCustomerByCuisine(customer, cuisine);
+    }
 
+    private void registerCuisineByCustomer(Cuisine cuisine, Customer customer) {
         cuisinesByCustomers.computeIfAbsent(customer, key -> new HashSet<>());
         cuisinesByCustomers.computeIfPresent(customer, (key, cuisines) -> {
             cuisines.add(cuisine);
             return cuisines;
         });
+    }
 
+    private void registerCustomerByCuisine(Customer customer, Cuisine cuisine) {
         customersByCuisines.computeIfAbsent(cuisine, key -> new HashSet<>());
         customersByCuisines.computeIfPresent(cuisine, (key, customers) -> {
             customers.add(customer);
