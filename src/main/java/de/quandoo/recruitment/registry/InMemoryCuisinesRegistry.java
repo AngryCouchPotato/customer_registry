@@ -3,18 +3,27 @@ package de.quandoo.recruitment.registry;
 import de.quandoo.recruitment.registry.api.CuisinesRegistry;
 import de.quandoo.recruitment.registry.model.Cuisine;
 import de.quandoo.recruitment.registry.model.Customer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class InMemoryCuisinesRegistry implements CuisinesRegistry {
+
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryCuisinesRegistry.class);
 
     private Map<Customer, Set<Cuisine>> cuisinesByCustomers = new HashMap<>();
     private Map<Cuisine, Set<Customer>> customersByCuisines = new HashMap<>();
 
     @Override
     public void register(final Customer customer, final Cuisine cuisine) {
-        if(customer == null || cuisine == null) {
-
+        if(customer == null) {
+            logger.error(String.format("Customer can not be null. Cuisine = %s", cuisine));
+            return;
+        }
+        if(cuisine == null) {
+            logger.error(String.format("Cuisine can not be null. Customer = %s", customer));
+            return;
         }
 
         Set<Cuisine> cuisines;
@@ -40,7 +49,7 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
     @Override
     public List<Customer> cuisineCustomers(final Cuisine cuisine) {
-        if(cuisine == null) {
+        if(cuisine == null || !customersByCuisines.containsKey(cuisine)) {
             return Collections.emptyList();
         }
         return new ArrayList<>(customersByCuisines.get(cuisine));
@@ -48,7 +57,7 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
     @Override
     public List<Cuisine> customerCuisines(final Customer customer) {
-        if(customer == null) {
+        if(customer == null || !cuisinesByCustomers.containsKey(customer)) {
             return Collections.emptyList();
         }
         return new ArrayList<>(cuisinesByCustomers.get(customer));
@@ -57,7 +66,7 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
     @Override
     public List<Cuisine> topCuisines(final int n) {
         PriorityQueue<Map.Entry<Cuisine, Set<Customer>>> queue = new PriorityQueue<>(new TopCuisineComparator());
-        customersByCuisines.entrySet().forEach((entry) -> queue.add(entry));
+        queue.addAll(customersByCuisines.entrySet());
 
         List<Cuisine> topCuisines = new ArrayList<>(n);
         for(int i = 0; i < n && !queue.isEmpty(); i++) {

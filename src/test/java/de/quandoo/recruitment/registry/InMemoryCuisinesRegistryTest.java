@@ -1,5 +1,6 @@
 package de.quandoo.recruitment.registry;
 
+import de.quandoo.recruitment.registry.api.CuisinesRegistry;
 import de.quandoo.recruitment.registry.model.Cuisine;
 import de.quandoo.recruitment.registry.model.Customer;
 import org.junit.Before;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.*;
 
 public class InMemoryCuisinesRegistryTest {
@@ -31,6 +33,44 @@ public class InMemoryCuisinesRegistryTest {
     }
 
     @Test
+    public void registerWithNullableCuisine() {
+        // Given
+        CuisinesRegistry cuisinesRegistry = new InMemoryCuisinesRegistry();
+        Customer customer = new Customer("1");
+        Cuisine cuisine = null;
+
+        // When
+        cuisinesRegistry.register(customer, cuisine);
+        List<Customer> customers = cuisinesRegistry.cuisineCustomers(cuisine);
+        List<Cuisine> cuisines = cuisinesRegistry.customerCuisines(customer);
+
+        // Then
+        assertNotNull(customers);
+        assertNotNull(cuisines);
+        assertEquals(0, customers.size());
+        assertEquals(0, cuisines.size());
+    }
+
+    @Test
+    public void registerWithNullableCustomer() {
+        // Given
+        CuisinesRegistry cuisinesRegistry = new InMemoryCuisinesRegistry();
+        Customer customer = null;
+        Cuisine cuisine = new Cuisine("Italian");
+
+        // When
+        cuisinesRegistry.register(customer, cuisine);
+        List<Customer> customers = cuisinesRegistry.cuisineCustomers(cuisine);
+        List<Cuisine> cuisines = cuisinesRegistry.customerCuisines(customer);
+
+        // Then
+        assertNotNull(customers);
+        assertNotNull(cuisines);
+        assertEquals(0, customers.size());
+        assertEquals(0, cuisines.size());
+    }
+
+    @Test
     public void cuisineCustomers() {
         // Given
         Cuisine cuisine = new Cuisine("French");
@@ -45,7 +85,7 @@ public class InMemoryCuisinesRegistryTest {
         assertNotNull(customers);
         assertEquals(2, customers.size());
         assertThat("List equality without order",
-            expectedCustomers, containsInAnyOrder(customers.toArray()));
+                expectedCustomers, containsInAnyOrder(customers.toArray()));
     }
 
     @Test
@@ -78,7 +118,7 @@ public class InMemoryCuisinesRegistryTest {
         assertNotNull(cuisines);
         assertEquals(4, cuisines.size());
         assertThat("List equality without order",
-            expectedCuisines, containsInAnyOrder(cuisines.toArray()));
+                expectedCuisines, containsInAnyOrder(cuisines.toArray()));
     }
 
     @Test
@@ -109,23 +149,23 @@ public class InMemoryCuisinesRegistryTest {
         assertEquals(expectedCuisine, topCuisines.get(0));
     }
 
-  @Test
-  public void topCuisinesMultiple() {
-    // Given
-    List<Cuisine> expectedCuisines = new ArrayList<>(4);
-    expectedCuisines.add(new Cuisine("Italian"));
-    expectedCuisines.add(new Cuisine("German"));
-    int count = 2;
+    @Test
+    public void topCuisinesMultiple() {
+        // Given
+        List<Cuisine> expectedCuisines = new ArrayList<>(4);
+        expectedCuisines.add(new Cuisine("Italian"));
+        expectedCuisines.add(new Cuisine("German"));
+        int count = 2;
 
-    // When
-    List<Cuisine> topCuisines = cuisinesRegistry.topCuisines(count);
+        // When
+        List<Cuisine> topCuisines = cuisinesRegistry.topCuisines(count);
 
-    // Then
-    assertNotNull(topCuisines);
-    assertEquals(2, topCuisines.size());
-    assertThat("List equality without order",
-        expectedCuisines, containsInAnyOrder(topCuisines.toArray()));
-  }
+        // Then
+        assertNotNull(topCuisines);
+        assertEquals(2, topCuisines.size());
+        assertThat("List equality without order",
+                expectedCuisines, contains(topCuisines.toArray()));
+    }
 
 
 }
