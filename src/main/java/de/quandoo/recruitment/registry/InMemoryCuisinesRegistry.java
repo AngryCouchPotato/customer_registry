@@ -7,13 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryCuisinesRegistry.class);
 
-    private Map<Customer, Set<Cuisine>> cuisinesByCustomers = new HashMap<>();
-    private Map<Cuisine, Set<Customer>> customersByCuisines = new HashMap<>();
+    private ConcurrentMap<Customer, Set<Cuisine>> cuisinesByCustomers = new ConcurrentHashMap<>();
+    private ConcurrentMap<Cuisine, Set<Customer>> customersByCuisines = new ConcurrentHashMap<>();
 
     @Override
     public void register(final Customer customer, final Cuisine cuisine) {
@@ -26,25 +28,17 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
             return;
         }
 
-        Set<Cuisine> cuisines;
-        if(cuisinesByCustomers.containsKey(customer)) {
-            cuisines = cuisinesByCustomers.get(customer);
+        cuisinesByCustomers.computeIfAbsent(customer, key -> new HashSet<>());
+        cuisinesByCustomers.computeIfPresent(customer, (key, cuisines) -> {
             cuisines.add(cuisine);
-        } else {
-            cuisines = new HashSet<>();
-            cuisines.add(cuisine);
-            cuisinesByCustomers.put(customer, cuisines);
-        }
+            return cuisines;
+        });
 
-        Set<Customer> customers;
-        if(customersByCuisines.containsKey(cuisine)) {
-            customers = customersByCuisines.get(cuisine);
+        customersByCuisines.computeIfAbsent(cuisine, key -> new HashSet<>());
+        customersByCuisines.computeIfPresent(cuisine, (key, customers) -> {
             customers.add(customer);
-        } else {
-            customers = new HashSet<>();
-            customers.add(customer);
-            customersByCuisines.put(cuisine, customers);
-        }
+            return customers;
+        });
     }
 
     @Override
