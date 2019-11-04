@@ -23,7 +23,7 @@ It is ok to change any code as long as the CuisinesRegistry interface remains un
 + Send us an **ssh** clone link to the repository.
 
 
-Result:
+## Result:
 1) Code was cleaned.
 2) Customers can follow more than one cuisine.
 customerCuisines method works with O(n) time and can return more then 1 cuisine
