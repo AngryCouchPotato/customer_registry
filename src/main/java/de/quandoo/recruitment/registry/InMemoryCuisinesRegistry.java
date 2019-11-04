@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
@@ -65,14 +66,14 @@ public class InMemoryCuisinesRegistry implements CuisinesRegistry {
 
     @Override
     public List<Cuisine> topCuisines(final int n) {
-        PriorityQueue<Map.Entry<Cuisine, Set<Customer>>> queue = new PriorityQueue<>(new TopCuisineComparator());
-        queue.addAll(customersByCuisines.entrySet());
-
-        List<Cuisine> topCuisines = new ArrayList<>(n);
-        for(int i = 0; i < n && !queue.isEmpty(); i++) {
-            topCuisines.add(queue.poll().getKey());
-        }
-        return topCuisines;
+        List<Map.Entry<Cuisine, Set<Customer>>> entryList = customersByCuisines.entrySet()
+                .stream()
+                .collect(Collectors.toCollection(ArrayList::new));
+        entryList.sort(new TopCuisineComparator());
+        return entryList.subList(0, n)
+                .stream()
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toList());
     }
 
     class TopCuisineComparator implements Comparator<Map.Entry<Cuisine, Set<Customer>>> {
