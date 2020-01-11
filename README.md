@@ -28,5 +28,8 @@ It is ok to change any code as long as the CuisinesRegistry interface remains un
 2) Customers can follow more than one cuisine.
 customerCuisines method works with O(n) time and can return more then 1 cuisine
 cuisineCustomers method works with O(n) time
-3) topCuisines method was implemented with using mergesort algorithm and works with O(n*Log(n)) time
-4) Just need to upgrade server. Add CPU and memory.
+3) topCuisines method was implemented with using mergesort algorithm
+4) Just need to:
+    - replace ConcurrentHashMap with inMemory database
+    - configure sharding.
+    - add load balancing
